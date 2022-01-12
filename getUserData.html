@@ -1,0 +1,38 @@
+<html>
+
+	<body>
+
+	</body>
+
+</html>
+
+<script type="module">
+	import { Octokit } from "https://cdn.skypack.dev/@octokit/core";
+	const octokit = new Octokit({ auth: `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` });
+
+	const username = window.location.search.substr(1).split("=")[1];
+
+	const response = await octokit.request("GET https://api.github.com/users/{user}/following", {
+  		user: username,
+	});
+
+	let csvContent = "data:text/csv;charset=utf-8,";
+
+	for (let i = 0; i < response["data"].length; i++) {
+
+		const userData = await octokit.request("GET https://api.github.com/users/{user}", {
+  			user: response["data"][i]["login"],
+		});
+  
+  		csvContent += userData["data"]["followers"] + ",";
+  		// numFollowers.push(userData["data"]["followers"]);
+	}
+
+	var encodedUri = encodeURI(csvContent);
+var link = document.createElement("a");
+link.setAttribute("href", encodedUri);
+link.setAttribute("download", "my_data.csv");
+document.body.appendChild(link); 
+link.click();
+
+</script>
